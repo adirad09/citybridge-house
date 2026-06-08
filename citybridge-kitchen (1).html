@@ -1,0 +1,671 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Citybridge Kitchen</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;0,700;1,400;1,600&family=Jost:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+:root {
+  --saffron:#D4722A; --gold:#C9933A; --cream:#FAF4EB; --warm-white:#FDF9F4;
+  --bark:#1E1108; --bark-mid:#5A3E28; --bark-light:#9A7355;
+  --card-bg:rgba(253,249,244,0.93); --shadow:0 2px 24px rgba(30,17,8,0.12);
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:'Jost',sans-serif;background:#120A03;color:var(--bark);min-height:100vh;}
+.bg{position:fixed;inset:0;z-index:0;overflow:hidden;background:linear-gradient(155deg,#1a0d04 0%,#0e0602 50%,#1c0d05 100%);}
+.bg::before{content:'';position:absolute;inset:0;background:radial-gradient(ellipse 70% 50% at 15% 15%,rgba(212,114,42,0.22) 0%,transparent 55%),radial-gradient(ellipse 50% 70% at 85% 80%,rgba(192,75,35,0.16) 0%,transparent 55%),radial-gradient(ellipse 60% 40% at 50% 50%,rgba(201,147,58,0.08) 0%,transparent 60%);}
+.bg::after{content:'';position:absolute;inset:0;background-image:url("data:image/svg+xml,%3Csvg width='120' height='120' viewBox='0 0 120 120' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' stroke='rgba(212,114,42,0.055)' stroke-width='0.7'%3E%3Ccircle cx='60' cy='60' r='50'/%3E%3Ccircle cx='60' cy='60' r='35'/%3E%3Ccircle cx='60' cy='60' r='20'/%3E%3Ccircle cx='60' cy='60' r='8'/%3E%3Cline x1='10' y1='60' x2='110' y2='60'/%3E%3Cline x1='60' y1='10' x2='60' y2='110'/%3E%3Cline x1='24.4' y1='24.4' x2='95.6' y2='95.6'/%3E%3Cline x1='95.6' y1='24.4' x2='24.4' y2='95.6'/%3E%3C/g%3E%3C/svg%3E");}
+.page{position:relative;z-index:1;max-width:1340px;margin:0 auto;padding:0 28px 160px;}
+header{text-align:center;padding:64px 20px 44px;}
+.eyebrow{font-size:10px;font-weight:600;letter-spacing:0.45em;text-transform:uppercase;color:var(--gold);margin-bottom:18px;opacity:0.85;}
+.logo{font-family:'Cormorant Garamond',serif;font-size:clamp(40px,7vw,80px);font-weight:600;color:var(--cream);letter-spacing:0.04em;line-height:1;}
+.logo span{color:var(--saffron);font-style:italic;}
+.logo-sub{font-family:'Cormorant Garamond',serif;font-size:clamp(13px,1.8vw,17px);font-style:italic;color:rgba(250,244,235,0.42);letter-spacing:0.08em;margin-top:14px;}
+.ornament{display:flex;align-items:center;justify-content:center;gap:16px;margin-top:24px;}
+.orn-line{width:80px;height:1px;background:linear-gradient(90deg,transparent,rgba(212,114,42,0.5));}
+.orn-line.r{background:linear-gradient(90deg,rgba(212,114,42,0.5),transparent);}
+.orn-dia{width:6px;height:6px;background:var(--saffron);transform:rotate(45deg);opacity:0.8;}
+.instruction{background:rgba(212,114,42,0.09);border:1px solid rgba(212,114,42,0.2);border-radius:10px;padding:12px 24px;text-align:center;color:rgba(250,244,235,0.6);font-size:13px;margin-bottom:40px;backdrop-filter:blur(8px);}
+.instruction b{color:var(--gold);font-weight:500;}
+
+/* FILTER BAR */
+.filter-bar{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:36px;}
+.fbtn{background:rgba(212,114,42,0.1);border:1px solid rgba(212,114,42,0.2);color:rgba(250,244,235,0.6);font-family:'Jost',sans-serif;font-size:11px;font-weight:500;letter-spacing:0.12em;text-transform:uppercase;padding:7px 16px;border-radius:20px;cursor:pointer;transition:all 0.18s;}
+.fbtn:hover{background:rgba(212,114,42,0.18);color:var(--gold);}
+.fbtn.active{background:rgba(212,114,42,0.25);border-color:var(--saffron);color:var(--gold);}
+
+.cat-hdr{display:flex;align-items:center;gap:16px;margin:44px 0 20px;}
+.cat-lbl{font-size:9.5px;font-weight:600;letter-spacing:0.38em;text-transform:uppercase;color:var(--saffron);white-space:nowrap;}
+.cat-line{flex:1;height:1px;background:rgba(212,114,42,0.18);}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(255px,1fr));gap:16px;}
+.card{background:var(--card-bg);border-radius:16px;overflow:hidden;cursor:pointer;transition:transform 0.22s ease,box-shadow 0.22s ease;box-shadow:var(--shadow);outline:3px solid transparent;backdrop-filter:blur(10px);position:relative;}
+.card:hover{transform:translateY(-5px);box-shadow:0 16px 48px rgba(30,17,8,0.2);}
+.card.selected{outline-color:var(--saffron);box-shadow:0 0 0 6px rgba(212,114,42,0.14),var(--shadow);}
+.card.selected .chk{opacity:1;transform:scale(1);}
+.card.hidden{display:none;}
+.card-img{position:relative;height:185px;overflow:hidden;background:linear-gradient(135deg,#c49060,#7a4e2a);display:flex;align-items:center;justify-content:center;}
+.card-img img{width:100%;height:100%;object-fit:cover;display:block;transition:transform 0.35s ease;}
+.card:hover .card-img img{transform:scale(1.07);}
+.card-ph{font-size:48px;}
+.chk{position:absolute;top:10px;right:10px;width:28px;height:28px;border-radius:50%;background:var(--saffron);display:flex;align-items:center;justify-content:center;opacity:0;transform:scale(0.5);transition:opacity 0.18s,transform 0.18s;z-index:2;box-shadow:0 2px 10px rgba(0,0,0,0.35);}
+.chk svg{width:13px;height:13px;stroke:#fff;fill:none;stroke-width:3;}
+.origin-tag{position:absolute;bottom:9px;left:9px;background:rgba(18,10,3,0.72);color:var(--gold);font-size:9px;font-weight:600;letter-spacing:0.18em;text-transform:uppercase;padding:3px 8px;border-radius:20px;backdrop-filter:blur(4px);}
+.card-body{padding:15px 17px 17px;}
+.card-name{font-family:'Cormorant Garamond',serif;font-size:19px;font-weight:700;color:var(--bark);line-height:1.15;margin-bottom:5px;}
+.card-desc{font-size:12px;color:var(--bark-light);line-height:1.5;margin-bottom:10px;}
+.card-meta{display:flex;gap:12px;font-size:11px;color:var(--bark-mid);font-weight:500;}
+
+/* PANEL */
+.panel-wrap{position:fixed;bottom:0;left:0;right:0;z-index:100;display:flex;justify-content:center;padding:0 20px 20px;pointer-events:none;}
+.panel{background:rgba(20,11,4,0.97);backdrop-filter:blur(24px);border:1px solid rgba(212,114,42,0.28);border-radius:18px;width:100%;max-width:760px;pointer-events:all;overflow:hidden;box-shadow:0 -8px 60px rgba(0,0,0,0.55);transition:max-height 0.38s cubic-bezier(0.4,0,0.2,1);max-height:62px;}
+.panel.open{max-height:620px;}
+.p-hdr{display:flex;align-items:center;justify-content:space-between;padding:16px 22px;cursor:pointer;user-select:none;}
+.p-title{font-family:'Cormorant Garamond',serif;font-size:19px;color:var(--cream);display:flex;align-items:center;gap:11px;}
+.p-cnt{background:var(--saffron);color:#fff;font-family:'Jost',sans-serif;font-size:11px;font-weight:600;padding:2px 9px;border-radius:20px;}
+.p-arr{color:var(--gold);font-size:18px;transition:transform 0.3s;}
+.panel.open .p-arr{transform:rotate(180deg);}
+.p-body{padding:0 22px 22px;overflow-y:auto;max-height:530px;}
+.p-empty{text-align:center;color:rgba(250,244,235,0.3);font-style:italic;font-size:13px;padding:4px 0 14px;}
+.dish-tags{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:16px;}
+.dish-tag{background:rgba(212,114,42,0.15);border:1px solid rgba(212,114,42,0.25);color:var(--gold);font-size:11px;font-weight:500;padding:3px 8px 3px 10px;border-radius:20px;display:flex;align-items:center;gap:6px;}
+.dish-tag-x{cursor:pointer;opacity:0.7;font-size:13px;line-height:1;transition:opacity 0.15s;}
+.dish-tag-x:hover{opacity:1;}
+
+/* SERVING SCALER IN PANEL */
+.scaler-row{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;padding-bottom:12px;border-bottom:1px solid rgba(212,114,42,0.15);}
+.scaler-label{color:rgba(250,244,235,0.55);font-size:12px;letter-spacing:0.05em;}
+.scaler-ctrl{display:flex;align-items:center;gap:10px;}
+.scaler-btn{width:26px;height:26px;border-radius:50%;background:rgba(212,114,42,0.2);border:1px solid rgba(212,114,42,0.35);color:var(--gold);font-size:16px;line-height:1;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:background 0.15s;font-family:'Jost',sans-serif;}
+.scaler-btn:hover{background:rgba(212,114,42,0.35);}
+.scaler-val{color:var(--cream);font-size:15px;font-weight:600;min-width:60px;text-align:center;font-family:'Cormorant Garamond',serif;}
+
+.ing-list{columns:2;column-gap:28px;margin-bottom:18px;}
+@media(max-width:480px){.ing-list{columns:1;}}
+.ing-item{display:flex;align-items:baseline;gap:8px;padding:5px 0;break-inside:avoid;color:var(--cream);font-size:12.5px;border-bottom:1px solid rgba(255,255,255,0.05);}
+.ing-dot{width:4px;height:4px;border-radius:50%;background:var(--saffron);flex-shrink:0;margin-bottom:2px;}
+.ing-name{flex:1;}
+.ing-qty{color:var(--gold);font-size:11px;font-weight:500;white-space:nowrap;}
+.copy-btn{width:100%;background:linear-gradient(135deg,var(--saffron),var(--gold));color:#fff;border:none;border-radius:10px;padding:13px;font-family:'Jost',sans-serif;font-size:13px;font-weight:600;letter-spacing:0.07em;text-transform:uppercase;cursor:pointer;transition:opacity 0.2s,transform 0.15s;}
+.copy-btn:hover{opacity:0.9;transform:translateY(-1px);}
+.copy-btn.copied{background:linear-gradient(135deg,#3a6b4a,#2d5a3e);}
+
+/* MODAL */
+.overlay{position:fixed;inset:0;background:rgba(12,6,2,0.88);z-index:200;display:flex;align-items:center;justify-content:center;padding:20px;opacity:0;pointer-events:none;transition:opacity 0.22s;backdrop-filter:blur(6px);}
+.overlay.on{opacity:1;pointer-events:all;}
+.modal{background:var(--warm-white);border-radius:22px;max-width:620px;width:100%;max-height:88vh;overflow-y:auto;transform:translateY(18px);transition:transform 0.28s cubic-bezier(0.4,0,0.2,1);box-shadow:0 40px 100px rgba(0,0,0,0.55);}
+.overlay.on .modal{transform:translateY(0);}
+.m-img{height:240px;overflow:hidden;border-radius:22px 22px 0 0;position:relative;background:linear-gradient(135deg,#d4a06a,#9a6035);display:flex;align-items:center;justify-content:center;}
+.m-img img{width:100%;height:100%;object-fit:cover;display:block;}
+.m-img .mph{font-size:64px;}
+.m-body{padding:28px 30px 30px;}
+.m-tag{font-size:10px;font-weight:600;letter-spacing:0.3em;text-transform:uppercase;color:var(--saffron);margin-bottom:7px;}
+.m-title{font-family:'Cormorant Garamond',serif;font-size:32px;font-weight:700;color:var(--bark);line-height:1.05;margin-bottom:8px;}
+.m-desc{color:var(--bark-light);font-size:13.5px;line-height:1.65;margin-bottom:20px;}
+
+/* SERVING SCALER IN MODAL */
+.m-scaler{display:flex;align-items:center;gap:14px;background:rgba(212,114,42,0.07);border:1px solid rgba(212,114,42,0.18);border-radius:10px;padding:10px 16px;margin-bottom:20px;}
+.m-scaler-label{color:var(--bark-mid);font-size:12.5px;flex:1;}
+.m-scaler-ctrl{display:flex;align-items:center;gap:10px;}
+.m-scaler-btn{width:28px;height:28px;border-radius:50%;background:rgba(212,114,42,0.15);border:1px solid rgba(212,114,42,0.3);color:var(--saffron);font-size:18px;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:background 0.15s;font-family:'Jost',sans-serif;line-height:1;}
+.m-scaler-btn:hover{background:rgba(212,114,42,0.28);}
+.m-scaler-val{font-family:'Cormorant Garamond',serif;font-size:17px;font-weight:700;color:var(--bark);min-width:70px;text-align:center;}
+
+.m-sec{font-family:'Cormorant Garamond',serif;font-size:18px;font-weight:700;color:var(--bark);margin-bottom:12px;padding-bottom:6px;border-bottom:1.5px solid rgba(212,114,42,0.18);}
+.m-ings{display:grid;grid-template-columns:1fr 1fr;gap:6px 16px;margin-bottom:22px;}
+.m-ing{font-size:13px;color:var(--bark-mid);display:flex;gap:6px;align-items:baseline;line-height:1.4;}
+.m-ing::before{content:'·';color:var(--saffron);font-size:16px;line-height:1;flex-shrink:0;}
+.m-footer{display:flex;gap:10px;flex-wrap:wrap;}
+.m-btn{flex:1;min-width:120px;padding:11px 16px;border-radius:10px;font-family:'Jost',sans-serif;font-size:12px;font-weight:600;letter-spacing:0.06em;text-transform:uppercase;cursor:pointer;border:none;transition:opacity 0.18s,transform 0.12s;}
+.m-btn:hover{opacity:0.86;transform:translateY(-1px);}
+.m-btn-p{background:linear-gradient(135deg,var(--saffron),var(--gold));color:#fff;}
+.m-btn-s{background:rgba(30,17,8,0.08);color:var(--bark);}
+</style>
+</head>
+<body>
+<div class="bg"></div>
+<div class="page">
+  <header>
+    <div class="eyebrow">Regional Indian Cooking</div>
+    <div class="logo">Citybridge <span>Kitchen</span></div>
+    <div class="logo-sub">Plan your week. One shopping list.</div>
+    <div class="ornament"><div class="orn-line"></div><div class="orn-dia"></div><div class="orn-line r"></div></div>
+  </header>
+  <div class="instruction"><b>Click any dish</b> to see ingredients &amp; adjust servings &nbsp;·&nbsp; <b>Add to list</b> to build your shopping list below</div>
+  <div class="filter-bar" id="filter-bar"></div>
+  <div id="recipe-grid"></div>
+</div>
+
+<div class="panel-wrap">
+  <div class="panel" id="panel">
+    <div class="p-hdr" onclick="togglePanel()">
+      <div class="p-title">🛒 Shopping List <span class="p-cnt" id="pcnt">0 dishes</span></div>
+      <div class="p-arr">▾</div>
+    </div>
+    <div class="p-body" id="pbody">
+      <p class="p-empty" id="pempty">Select dishes above to build your list</p>
+      <div class="dish-tags" id="dtags"></div>
+      <div class="scaler-row" id="scaler-row" style="display:none">
+        <div class="scaler-label">Servings per dish</div>
+        <div class="scaler-ctrl">
+          <button class="scaler-btn" onclick="panelScale(-1)">−</button>
+          <div class="scaler-val" id="panel-serves">4 servings</div>
+          <button class="scaler-btn" onclick="panelScale(1)">+</button>
+        </div>
+      </div>
+      <div class="ing-list" id="ilist"></div>
+      <button class="copy-btn" id="copybtn" style="display:none" onclick="copyList()">Copy Shopping List</button>
+    </div>
+  </div>
+</div>
+
+<div class="overlay" id="overlay" onclick="outsideClose(event)">
+  <div class="modal"><div id="mc"></div></div>
+</div>
+
+<script>
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+//  CITYBRIDGE KITCHEN — RECIPE DATA
+//  ─────────────────────────────────────────────────────────────────
+//  TO ADD A NEW DISH: paste a new recipe object into the R array
+//  below, before the closing ]; on the last line of this section.
+//
+//  Each recipe follows this format:
+//  {
+//    id:     'unique-slug',          // lowercase, hyphens only
+//    name:   'Display Name',
+//    cat:    'Category',             // must match an existing category
+//                                    // OR add a new one (auto-appears in filter bar)
+//                                    // Categories: Flatbread | Vegetarian Main |
+//                                    //   Meat Main | Sabzi | Dal & Lentils |
+//                                    //   Rice & One-Pot | Fish
+//    emoji:  '🍛',
+//    origin: 'Region / State',
+//    time:   '45 min',
+//    serves: 4,                      // base serving size (always use 4)
+//    px:     'pexels search query',  // 3-5 words, describes the dish for image search
+//    desc:   'One or two sentence description.',
+//    ings: [
+//      { n: 'Ingredient name', q: 200, u: 'g' },
+//      { n: 'Another ingredient', q: 3, u: '' },   // u:'' for countable items
+//      { n: 'Salt', q: 0, u: 'to taste' },         // q:0 for "to taste" items
+//    ]
+//  },
+//
+//  IMPORTANT: each id must be unique. If you use a duplicate id,
+//  the second recipe will silently overwrite the first.
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+const PEXELS_KEY='oJnRw7PpuiFfCcjihti1m9S6QzxAk9BdLrdaGd7deKgXoEjLKDAH0jJI';
+const imgCache={};
+async function pexFetch(query,id){
+  if(imgCache[id]!==undefined)return imgCache[id];
+  try{
+    const r=await fetch(`https://api.pexels.com/v1/search?query=${encodeURIComponent(query)}&per_page=3&orientation=landscape`,{headers:{Authorization:PEXELS_KEY}});
+    const d=await r.json();
+    const url=d.photos?.[0]?.src?.large2x||d.photos?.[0]?.src?.large||null;
+    imgCache[id]=url;return url;
+  }catch{imgCache[id]=null;return null;}
+}
+
+const R=[
+  // ── FLATBREADS ──
+  {id:'missi-roti',name:'Missi Roti',cat:'Flatbread',emoji:'🫓',origin:'Punjab',time:'25 min',serves:4,px:'besan flatbread indian bread',
+   desc:'Gram flour-laced flatbread with spices — nutty and golden, excellent with dal.',
+   ings:[{n:'Whole wheat flour',q:250,u:'g'},{n:'Gram flour (besan)',q:100,u:'g'},{n:'Onion, finely chopped',q:80,u:'g'},{n:'Fresh coriander',q:15,u:'g'},{n:'Green chillies',q:2,u:''},{n:'Ajwain (carom seeds)',q:3,u:'g'},{n:'Turmeric',q:2,u:'g'},{n:'Red chilli powder',q:2,u:'g'},{n:'Salt',q:0,u:'to taste'},{n:'Ghee',q:40,u:'g'}]},
+
+  {id:'methi-thepla',name:'Methi Thepla',cat:'Flatbread',emoji:'🫓',origin:'Gujarat',time:'30 min',serves:4,px:'methi thepla gujarati flatbread',
+   desc:'Gujarati flatbread with fenugreek — stays soft for days, perfect for lunches.',
+   ings:[{n:'Whole wheat flour',q:280,u:'g'},{n:'Fresh fenugreek leaves (methi)',q:100,u:'g'},{n:'Full-fat yoghurt',q:80,u:'g'},{n:'Turmeric',q:2,u:'g'},{n:'Red chilli powder',q:2,u:'g'},{n:'Cumin seeds',q:3,u:'g'},{n:'Salt',q:0,u:'to taste'},{n:'Oil',q:30,u:'ml'}]},
+
+  {id:'makki-roti',name:'Makki di Roti',cat:'Flatbread',emoji:'🫓',origin:'Punjab',time:'30 min',serves:4,px:'makki roti cornmeal flatbread punjabi',
+   desc:'Cornmeal flatbread — the classic partner to sarson da saag.',
+   ings:[{n:'Cornmeal (maize flour)',q:400,u:'g'},{n:'Warm water',q:220,u:'ml'},{n:'Salt',q:0,u:'to taste'},{n:'Ghee',q:40,u:'g'}]},
+
+  {id:'lachha-paratha',name:'Lachha Paratha',cat:'Flatbread',emoji:'🫓',origin:'North India',time:'35 min',serves:4,px:'lachha paratha layered flatbread',
+   desc:'Layered, flaky whole wheat flatbread — more special than plain paratha.',
+   ings:[{n:'Whole wheat flour',q:350,u:'g'},{n:'Water',q:180,u:'ml'},{n:'Salt',q:0,u:'to taste'},{n:'Ghee',q:60,u:'g'}]},
+
+  {id:'puri',name:'Puri',cat:'Flatbread',emoji:'🫓',origin:'North India',time:'20 min',serves:4,px:'puri fried indian bread puffed',
+   desc:'Deep-fried puffed bread — for a weekend treat with aloo sabzi or chole.',
+   ings:[{n:'Whole wheat flour',q:300,u:'g'},{n:'Water',q:150,u:'ml'},{n:'Salt',q:0,u:'to taste'},{n:'Oil',q:500,u:'ml (for frying)'}]},
+
+  {id:'bajra-roti',name:'Bajra Roti',cat:'Flatbread',emoji:'🫓',origin:'Rajasthan',time:'30 min',serves:4,px:'millet flatbread indian bread',
+   desc:'Pearl millet flatbread — dense, nutty, and far more flavourful than wheat roti.',
+   ings:[{n:'Pearl millet flour (bajra)',q:400,u:'g'},{n:'Warm water',q:200,u:'ml'},{n:'Salt',q:0,u:'to taste'},{n:'Ghee',q:40,u:'g'}]},
+
+  {id:'thalipeeth',name:'Thalipeeth',cat:'Flatbread',emoji:'🫓',origin:'Maharashtra',time:'30 min',serves:4,px:'thalipeeth maharashtrian multigrain flatbread',
+   desc:'Maharashtrian multigrain flatbread with onion and coriander — completely different texture to wheat roti.',
+   ings:[{n:'Bhajani (multigrain flour) or mixed flour',q:320,u:'g'},{n:'Onion, finely chopped',q:100,u:'g'},{n:'Fresh coriander',q:20,u:'g'},{n:'Green chillies',q:2,u:''},{n:'Cumin seeds',q:3,u:'g'},{n:'Sesame seeds',q:10,u:'g'},{n:'Salt',q:0,u:'to taste'},{n:'Oil',q:30,u:'ml'}]},
+
+  {id:'bedmi-puri',name:'Bedmi Puri',cat:'Flatbread',emoji:'🫓',origin:'Varanasi',time:'40 min',serves:4,px:'bedmi puri stuffed bread varanasi',
+   desc:'Puris stuffed with spiced urad dal paste — a Varanasi speciality, excellent with aloo sabzi.',
+   ings:[{n:'Whole wheat flour',q:300,u:'g'},{n:'Urad dal (split, washed)',q:100,u:'g'},{n:'Fennel seeds',q:5,u:'g'},{n:'Coriander powder',q:5,u:'g'},{n:'Red chilli powder',q:3,u:'g'},{n:'Asafoetida (hing)',q:1,u:'g'},{n:'Salt',q:0,u:'to taste'},{n:'Oil',q:500,u:'ml (for frying)'}]},
+
+  // ── VEGETARIAN MAINS ──
+  {id:'shahi-paneer',name:'Shahi Paneer',cat:'Vegetarian Main',emoji:'🧀',origin:'Mughlai',time:'40 min',serves:4,px:'shahi paneer rich creamy curry',
+   desc:'Rich cashew and cream-based paneer curry — richer and more indulgent than matar paneer.',
+   ings:[{n:'Paneer',q:450,u:'g'},{n:'Cashews',q:70,u:'g'},{n:'Double cream',q:100,u:'ml'},{n:'Onions',q:300,u:'g'},{n:'Tomatoes',q:250,u:'g'},{n:'Ginger',q:20,u:'g'},{n:'Garlic',q:20,u:'g'},{n:'Butter',q:30,u:'g'},{n:'Green cardamom pods',q:4,u:''},{n:'Bay leaves',q:2,u:''},{n:'Turmeric',q:3,u:'g'},{n:'Garam masala',q:8,u:'g'},{n:'Kashmiri red chilli powder',q:5,u:'g'},{n:'Sugar',q:5,u:'g'},{n:'Rose water',q:5,u:'ml'}]},
+
+  {id:'kadai-paneer',name:'Kadai Paneer',cat:'Vegetarian Main',emoji:'🧀',origin:'North India',time:'35 min',serves:4,px:'kadai paneer dry curry peppers',
+   desc:'Paneer and peppers in a robust freshly-ground kadai masala — drier and more textured than most paneer dishes.',
+   ings:[{n:'Paneer',q:450,u:'g'},{n:'Onions',q:280,u:'g'},{n:'Tomatoes',q:350,u:'g'},{n:'Green / red peppers',q:200,u:'g'},{n:'Ginger',q:25,u:'g'},{n:'Garlic',q:25,u:'g'},{n:'Oil',q:45,u:'ml'},{n:'Whole coriander seeds',q:10,u:'g'},{n:'Whole red chillies',q:4,u:''},{n:'Cumin seeds',q:5,u:'g'},{n:'Turmeric',q:3,u:'g'},{n:'Garam masala',q:5,u:'g'},{n:'Kasuri methi',q:8,u:'g'},{n:'Fresh coriander',q:20,u:'g'}]},
+
+  {id:'paneer-bhurji',name:'Paneer Bhurji',cat:'Vegetarian Main',emoji:'🧀',origin:'North India',time:'20 min',serves:4,px:'paneer bhurji scrambled spiced',
+   desc:'Scrambled spiced paneer with onions and tomatoes — quick, versatile, great as a wrap filling.',
+   ings:[{n:'Paneer, crumbled',q:450,u:'g'},{n:'Onions',q:200,u:'g'},{n:'Tomatoes',q:200,u:'g'},{n:'Green chillies',q:2,u:''},{n:'Ginger',q:15,u:'g'},{n:'Oil',q:30,u:'ml'},{n:'Cumin seeds',q:3,u:'g'},{n:'Turmeric',q:2,u:'g'},{n:'Red chilli powder',q:3,u:'g'},{n:'Coriander powder',q:5,u:'g'},{n:'Garam masala',q:5,u:'g'},{n:'Kasuri methi',q:5,u:'g'},{n:'Fresh coriander',q:20,u:'g'}]},
+
+  {id:'palak-paneer',name:'Palak Paneer',cat:'Vegetarian Main',emoji:'🌿',origin:'North India',time:'35 min',serves:4,px:'palak paneer spinach curry',
+   desc:'Paneer in a smooth spinach gravy — a classic worth rotating back in regularly.',
+   ings:[{n:'Paneer',q:400,u:'g'},{n:'Fresh spinach',q:600,u:'g'},{n:'Onions',q:200,u:'g'},{n:'Tomatoes',q:150,u:'g'},{n:'Ginger',q:20,u:'g'},{n:'Garlic',q:20,u:'g'},{n:'Green chillies',q:2,u:''},{n:'Oil',q:40,u:'ml'},{n:'Cumin seeds',q:3,u:'g'},{n:'Turmeric',q:2,u:'g'},{n:'Coriander powder',q:5,u:'g'},{n:'Garam masala',q:5,u:'g'},{n:'Single cream',q:50,u:'ml'}]},
+
+  {id:'chana-masala',name:'Chana Masala',cat:'Vegetarian Main',emoji:'🫘',origin:'Punjab',time:'50 min',serves:4,px:'chana masala chickpea curry',
+   desc:'Chickpeas in a bold, tangy masala — deeply satisfying and a complete meal with rice or bhatura.',
+   ings:[{n:'Dried white chickpeas',q:350,u:'g (soaked overnight)'},{n:'Onions',q:300,u:'g'},{n:'Tomatoes',q:300,u:'g'},{n:'Ginger',q:25,u:'g'},{n:'Garlic',q:25,u:'g'},{n:'Oil',q:45,u:'ml'},{n:'Cumin seeds',q:5,u:'g'},{n:'Bay leaves',q:2,u:''},{n:'Chole masala powder',q:15,u:'g'},{n:'Turmeric',q:3,u:'g'},{n:'Red chilli powder',q:5,u:'g'},{n:'Amchur',q:5,u:'g'},{n:'Fresh coriander',q:20,u:'g'}]},
+
+  {id:'kathal',name:'Kathal Curry',cat:'Vegetarian Main',emoji:'🫙',origin:'North India',time:'45 min',serves:4,px:'jackfruit curry indian spices',
+   desc:'Young jackfruit curry with a pulled-meat texture. Available tinned in most South Asian shops.',
+   ings:[{n:'Tinned young jackfruit',q:1120,u:'g (2 tins)'},{n:'Onions',q:450,u:'g'},{n:'Tomatoes',q:400,u:'g'},{n:'Full-fat yoghurt',q:120,u:'g'},{n:'Ginger',q:30,u:'g'},{n:'Garlic',q:30,u:'g'},{n:'Oil',q:60,u:'ml'},{n:'Cumin seeds',q:5,u:'g'},{n:'Turmeric',q:5,u:'g'},{n:'Coriander powder',q:10,u:'g'},{n:'Garam masala',q:8,u:'g'},{n:'Red chilli powder',q:5,u:'g'},{n:'Fresh coriander',q:20,u:'g'}]},
+
+  {id:'kala-chana',name:'Kala Chana',cat:'Vegetarian Main',emoji:'🫘',origin:'Punjab',time:'50 min',serves:4,px:'black chickpeas curry indian dal',
+   desc:'Black chickpeas slow-cooked in a deeply spiced masala — earthier and denser than standard chole.',
+   ings:[{n:'Dried black chickpeas',q:350,u:'g (soaked overnight)'},{n:'Onions',q:300,u:'g'},{n:'Tomatoes',q:300,u:'g'},{n:'Ginger',q:20,u:'g'},{n:'Garlic',q:25,u:'g'},{n:'Oil',q:45,u:'ml'},{n:'Cumin seeds',q:5,u:'g'},{n:'Turmeric',q:3,u:'g'},{n:'Coriander powder',q:8,u:'g'},{n:'Garam masala',q:5,u:'g'},{n:'Amchur',q:5,u:'g'},{n:'Red chilli powder',q:4,u:'g'},{n:'Fresh coriander',q:20,u:'g'}]},
+
+  {id:'paneer-pasanda',name:'Paneer Pasanda',cat:'Vegetarian Main',emoji:'🧀',origin:'Mughlai',time:'55 min',serves:4,px:'paneer stuffed curry mughlai indian',
+   desc:'Stuffed paneer slices in a cashew and cream gravy — one of the most elegant Mughlai vegetarian dishes.',
+   ings:[{n:'Paneer',q:500,u:'g'},{n:'Cashews',q:60,u:'g'},{n:'Single cream',q:120,u:'ml'},{n:'Onions',q:300,u:'g'},{n:'Tomatoes',q:250,u:'g'},{n:'Butter',q:30,u:'g'},{n:'Fresh mint leaves',q:15,u:'g'},{n:'Raisins',q:30,u:'g'},{n:'Desiccated coconut',q:20,u:'g'},{n:'Ginger',q:20,u:'g'},{n:'Garlic',q:20,u:'g'},{n:'Green chillies',q:2,u:''},{n:'Green cardamom pods',q:4,u:''},{n:'Cinnamon stick',q:1,u:''},{n:'Garam masala',q:5,u:'g'},{n:'Rose water',q:5,u:'ml'}]},
+
+  {id:'dahi-paneer',name:'Dahi Wali Paneer',cat:'Vegetarian Main',emoji:'🍛',origin:'North India',time:'35 min',serves:4,px:'paneer yoghurt gravy indian curry',
+   desc:'Paneer in a yoghurt-based gravy — lighter and tangier than cream curries.',
+   ings:[{n:'Paneer',q:400,u:'g'},{n:'Full-fat yoghurt',q:300,u:'g'},{n:'Onions',q:280,u:'g'},{n:'Ginger',q:20,u:'g'},{n:'Garlic',q:20,u:'g'},{n:'Green chillies',q:2,u:''},{n:'Oil',q:45,u:'ml'},{n:'Cumin seeds',q:3,u:'g'},{n:'Turmeric',q:3,u:'g'},{n:'Coriander powder',q:8,u:'g'},{n:'Fennel powder',q:3,u:'g'},{n:'Garam masala',q:5,u:'g'},{n:'Kasuri methi',q:8,u:'g'},{n:'Fresh coriander',q:20,u:'g'}]},
+
+  {id:'paneer-lababdar',name:'Paneer Lababdar',cat:'Vegetarian Main',emoji:'🧀',origin:'North India',time:'40 min',serves:4,px:'paneer lababdar tomato cashew curry',
+   desc:'Paneer in a rich tomato and cashew gravy — more textured than makhani, less heavy than shahi.',
+   ings:[{n:'Paneer',q:450,u:'g'},{n:'Cashews',q:50,u:'g'},{n:'Onions',q:300,u:'g'},{n:'Tomatoes',q:400,u:'g'},{n:'Butter',q:30,u:'g'},{n:'Single cream',q:80,u:'ml'},{n:'Ginger',q:20,u:'g'},{n:'Garlic',q:20,u:'g'},{n:'Turmeric',q:3,u:'g'},{n:'Coriander powder',q:8,u:'g'},{n:'Kashmiri red chilli powder',q:5,u:'g'},{n:'Garam masala',q:5,u:'g'},{n:'Kasuri methi',q:8,u:'g'},{n:'Fresh coriander',q:15,u:'g'}]},
+
+  // ── MEAT MAINS ──
+  {id:'butter-chicken',name:'Butter Chicken',cat:'Meat Main',emoji:'🍗',origin:'Delhi',time:'50 min',serves:4,px:'butter chicken murgh makhani curry',
+   desc:'Murgh makhani — the classic. Reheat-friendly and crowd-pleasing. Marinade and sauce are the two-step secret.',
+   ings:[{n:'Chicken, bone-in pieces',q:1000,u:'g'},{n:'Full-fat yoghurt',q:150,u:'g'},{n:'Butter',q:60,u:'g'},{n:'Single cream',q:120,u:'ml'},{n:'Onions',q:300,u:'g'},{n:'Tomatoes',q:500,u:'g'},{n:'Cashews',q:50,u:'g'},{n:'Ginger',q:30,u:'g'},{n:'Garlic',q:30,u:'g'},{n:'Oil',q:30,u:'ml'},{n:'Kashmiri red chilli powder',q:8,u:'g'},{n:'Turmeric',q:3,u:'g'},{n:'Garam masala',q:8,u:'g'},{n:'Kasuri methi',q:8,u:'g'},{n:'Sugar',q:5,u:'g'}]},
+
+  {id:'chicken-do-pyaza',name:'Chicken Do Pyaza',cat:'Meat Main',emoji:'🍗',origin:'Mughlai',time:'50 min',serves:4,px:'chicken do pyaza onion curry',
+   desc:'Onion-heavy chicken curry — the double dose of onions gives it a sweeter, more complex character.',
+   ings:[{n:'Chicken, bone-in',q:1000,u:'g'},{n:'Onions',q:700,u:'g'},{n:'Tomatoes',q:250,u:'g'},{n:'Ginger',q:30,u:'g'},{n:'Garlic',q:30,u:'g'},{n:'Oil',q:60,u:'ml'},{n:'Whole cloves',q:4,u:''},{n:'Cardamom pods',q:4,u:''},{n:'Bay leaves',q:2,u:''},{n:'Coriander powder',q:10,u:'g'},{n:'Cumin powder',q:5,u:'g'},{n:'Turmeric',q:3,u:'g'},{n:'Red chilli powder',q:5,u:'g'},{n:'Garam masala',q:8,u:'g'},{n:'Full-fat yoghurt',q:100,u:'g'}]},
+
+  {id:'rogan-josh',name:'Mutton Rogan Josh',cat:'Meat Main',emoji:'🐑',origin:'Kashmir',time:'90 min',serves:4,px:'rogan josh kashmiri mutton curry',
+   desc:'Kashmiri slow-cooked lamb in a richly aromatic, deeply red gravy. Best made a day ahead.',
+   ings:[{n:'Mutton / lamb, bone-in',q:1000,u:'g'},{n:'Full-fat yoghurt',q:200,u:'g'},{n:'Mustard oil',q:75,u:'ml'},{n:'Onions',q:400,u:'g'},{n:'Ginger',q:30,u:'g'},{n:'Garlic',q:30,u:'g'},{n:'Kashmiri red chilli powder',q:15,u:'g'},{n:'Fennel powder',q:8,u:'g'},{n:'Dry ginger powder',q:5,u:'g'},{n:'Whole black cardamom',q:3,u:''},{n:'Whole green cardamom',q:5,u:''},{n:'Cinnamon stick',q:1,u:''},{n:'Cloves',q:5,u:''},{n:'Bay leaves',q:3,u:''},{n:'Turmeric',q:3,u:'g'},{n:'Garam masala',q:8,u:'g'}]},
+
+  {id:'egg-curry',name:'Egg Curry',cat:'Meat Main',emoji:'🥚',origin:'North India',time:'30 min',serves:4,px:'egg curry indian masala boiled eggs',
+   desc:'Massively underrated and quick to make. Hard-boiled eggs in a spiced onion-tomato gravy.',
+   ings:[{n:'Eggs',q:8,u:''},{n:'Onions',q:280,u:'g'},{n:'Tomatoes',q:280,u:'g'},{n:'Ginger',q:20,u:'g'},{n:'Garlic',q:20,u:'g'},{n:'Oil',q:40,u:'ml'},{n:'Cumin seeds',q:3,u:'g'},{n:'Turmeric',q:3,u:'g'},{n:'Coriander powder',q:8,u:'g'},{n:'Red chilli powder',q:5,u:'g'},{n:'Garam masala',q:5,u:'g'},{n:'Fresh coriander',q:20,u:'g'}]},
+
+  {id:'chettinad',name:'Chicken Chettinad',cat:'Meat Main',emoji:'🍗',origin:'Tamil Nadu',time:'60 min',serves:4,px:'chicken curry south indian spices dark',
+   desc:'One of the most complexly spiced curries in the Indian canon. Dark, aromatic, and unlike anything from the north.',
+   ings:[{n:'Chicken, bone-in',q:1000,u:'g'},{n:'Onions',q:450,u:'g'},{n:'Tomatoes',q:300,u:'g'},{n:'Desiccated coconut',q:50,u:'g'},{n:'Ginger',q:30,u:'g'},{n:'Garlic',q:40,u:'g'},{n:'Black peppercorns',q:10,u:'g'},{n:'Fennel seeds',q:8,u:'g'},{n:'Kalpasi (stone flower)',q:5,u:'g'},{n:'Marathi mokku',q:5,u:'pods'},{n:'Star anise',q:2,u:''},{n:'Cinnamon stick',q:1,u:''},{n:'Cardamom pods',q:4,u:''},{n:'Cloves',q:4,u:''},{n:'Dried red chillies',q:6,u:''},{n:'Curry leaves',q:2,u:'sprigs'},{n:'Turmeric',q:5,u:'g'},{n:'Coriander powder',q:10,u:'g'}]},
+
+  {id:'nihari',name:'Nihari',cat:'Meat Main',emoji:'🦴',origin:'Delhi / Lucknow',time:'180 min',serves:4,px:'nihari slow braised beef lamb curry',
+   desc:'Slow-braised shank curry with an extraordinary depth of spice. Traditionally a breakfast dish — keeps and reheats exceptionally well.',
+   ings:[{n:'Lamb / beef shank',q:1000,u:'g'},{n:'Onions',q:400,u:'g'},{n:'Ginger',q:40,u:'g'},{n:'Garlic',q:40,u:'g'},{n:'Oil or ghee',q:80,u:'ml'},{n:'Whole wheat flour (for thickening)',q:30,u:'g'},{n:'Nihari masala',q:25,u:'g'},{n:'Fennel powder',q:5,u:'g'},{n:'Cardamom pods',q:5,u:''},{n:'Bay leaves',q:3,u:''},{n:'Cinnamon stick',q:1,u:''},{n:'Cloves',q:5,u:''},{n:'Turmeric',q:3,u:'g'},{n:'Red chilli powder',q:8,u:'g'},{n:'Fresh ginger (julienned, to garnish)',q:20,u:'g'},{n:'Fresh coriander',q:20,u:'g'},{n:'Lemon',q:1,u:''}]},
+
+  {id:'cafreal',name:'Chicken Cafreal',cat:'Meat Main',emoji:'🍗',origin:'Goa',time:'50 min',serves:4,px:'chicken cafreal goan green masala',
+   desc:'Goan green masala chicken — herbaceous rather than spice-forward. Completely different flavour profile from any northern curry.',
+   ings:[{n:'Chicken, bone-in',q:1000,u:'g'},{n:'Fresh coriander',q:60,u:'g'},{n:'Fresh mint',q:20,u:'g'},{n:'Green chillies',q:6,u:''},{n:'Ginger',q:30,u:'g'},{n:'Garlic',q:30,u:'g'},{n:'Lime juice',q:30,u:'ml'},{n:'Oil',q:45,u:'ml'},{n:'Cloves',q:4,u:''},{n:'Cinnamon stick',q:1,u:''},{n:'Cardamom pods',q:3,u:''},{n:'Black peppercorns',q:8,u:'g'},{n:'Cumin seeds',q:3,u:'g'},{n:'Turmeric',q:3,u:'g'},{n:'Salt',q:0,u:'to taste'}]},
+
+  {id:'vindaloo',name:'Pork Vindaloo',cat:'Meat Main',emoji:'🐷',origin:'Goa',time:'90 min',serves:4,px:'pork vindaloo goan curry hot',
+   desc:'Aggressively tangy and hot Goan pork curry. Intensifies overnight — one of the best reheated dishes on this list.',
+   ings:[{n:'Pork shoulder, cubed',q:900,u:'g'},{n:'Onions',q:300,u:'g'},{n:'Garlic',q:40,u:'g'},{n:'Ginger',q:30,u:'g'},{n:'Malt or white wine vinegar',q:60,u:'ml'},{n:'Oil',q:45,u:'ml'},{n:'Dried Kashmiri red chillies',q:12,u:''},{n:'Cumin seeds',q:5,u:'g'},{n:'Black peppercorns',q:8,u:'g'},{n:'Cinnamon stick',q:1,u:''},{n:'Cloves',q:5,u:''},{n:'Cardamom pods',q:3,u:''},{n:'Turmeric',q:3,u:'g'},{n:'Sugar',q:5,u:'g'},{n:'Mustard seeds',q:3,u:'g'}]},
+
+  {id:'mutton-korma',name:'Mutton Korma',cat:'Meat Main',emoji:'🐑',origin:'Mughlai',time:'90 min',serves:4,px:'mutton korma mild aromatic curry',
+   desc:'Lamb braised in yoghurt and whole spices — mild, aromatic, and very different from a standard curry.',
+   ings:[{n:'Mutton / lamb, bone-in',q:1000,u:'g'},{n:'Full-fat yoghurt',q:250,u:'g'},{n:'Onions',q:400,u:'g'},{n:'Cashews',q:60,u:'g'},{n:'Ginger',q:30,u:'g'},{n:'Garlic',q:30,u:'g'},{n:'Oil or ghee',q:70,u:'ml'},{n:'Green cardamom',q:6,u:'pods'},{n:'Black cardamom',q:2,u:'pods'},{n:'Cinnamon stick',q:1,u:''},{n:'Cloves',q:5,u:''},{n:'Bay leaves',q:3,u:''},{n:'Fennel powder',q:5,u:'g'},{n:'Coriander powder',q:10,u:'g'},{n:'Garam masala',q:8,u:'g'},{n:'Saffron',q:0.5,u:'g'},{n:'Rose water',q:10,u:'ml'}]},
+
+  {id:'bhuna-gosht',name:'Bhuna Gosht',cat:'Meat Main',emoji:'🐑',origin:'North India',time:'75 min',serves:4,px:'bhuna gosht dry lamb curry',
+   desc:'Dry-ish lamb curry cooked down until the masala coats every piece of meat. Excellent reheated.',
+   ings:[{n:'Mutton / lamb, bone-in',q:1000,u:'g'},{n:'Onions',q:450,u:'g'},{n:'Tomatoes',q:300,u:'g'},{n:'Full-fat yoghurt',q:150,u:'g'},{n:'Ginger',q:35,u:'g'},{n:'Garlic',q:35,u:'g'},{n:'Mustard oil',q:70,u:'ml'},{n:'Cumin seeds',q:5,u:'g'},{n:'Bay leaves',q:2,u:''},{n:'Black cardamom',q:2,u:'pods'},{n:'Cinnamon stick',q:1,u:''},{n:'Cloves',q:4,u:''},{n:'Turmeric',q:5,u:'g'},{n:'Coriander powder',q:10,u:'g'},{n:'Red chilli powder',q:8,u:'g'},{n:'Garam masala',q:8,u:'g'}]},
+
+  {id:'keema',name:'Keema Do Pyaza',cat:'Meat Main',emoji:'🥩',origin:'Mughlai',time:'45 min',serves:4,px:'keema mince lamb curry indian onion',
+   desc:'Minced lamb with onions added in two stages — caramelised into the masala, then added fresh at the end for crunch.',
+   ings:[{n:'Minced lamb',q:600,u:'g'},{n:'Onions',q:600,u:'g'},{n:'Tomatoes',q:250,u:'g'},{n:'Frozen peas',q:150,u:'g'},{n:'Ginger',q:30,u:'g'},{n:'Garlic',q:30,u:'g'},{n:'Full-fat yoghurt',q:100,u:'g'},{n:'Oil',q:60,u:'ml'},{n:'Cloves',q:4,u:''},{n:'Cardamom pods',q:3,u:''},{n:'Bay leaves',q:2,u:''},{n:'Cinnamon stick',q:1,u:''},{n:'Turmeric',q:3,u:'g'},{n:'Coriander powder',q:10,u:'g'},{n:'Cumin powder',q:5,u:'g'},{n:'Red chilli powder',q:5,u:'g'},{n:'Garam masala',q:8,u:'g'},{n:'Fresh coriander',q:25,u:'g'}]},
+
+  {id:'kosha',name:'Kosha Mangsho',cat:'Meat Main',emoji:'🐑',origin:'Bengal',time:'90 min',serves:4,px:'bengali mutton curry slow cooked dark',
+   desc:'Bengali slow-cooked mutton — dark, caramelised masala clinging to the meat. One of the great Indian dishes.',
+   ings:[{n:'Mutton / lamb, bone-in',q:1000,u:'g'},{n:'Onions',q:600,u:'g'},{n:'Full-fat yoghurt',q:200,u:'g'},{n:'Mustard oil',q:75,u:'ml'},{n:'Ginger',q:40,u:'g'},{n:'Garlic',q:40,u:'g'},{n:'Bay leaves',q:3,u:''},{n:'Black peppercorns',q:5,u:'g'},{n:'Green cardamom',q:5,u:'pods'},{n:'Cloves',q:5,u:''},{n:'Cinnamon sticks',q:2,u:''},{n:'Dried red chillies',q:4,u:''},{n:'Turmeric',q:8,u:'g'},{n:'Red chilli powder',q:8,u:'g'},{n:'Cumin powder',q:5,u:'g'},{n:'Coriander powder',q:10,u:'g'},{n:'Sugar',q:5,u:'g'}]},
+
+  // ── SABZI ──
+  {id:'aloo-gobi',name:'Aloo Gobi',cat:'Sabzi',emoji:'🥦',origin:'North India',time:'30 min',serves:4,px:'aloo gobi cauliflower potato curry',
+   desc:'Cauliflower and potato dry curry — a reliable workhorse that pairs well with any dal or roti.',
+   ings:[{n:'Cauliflower',q:500,u:'g'},{n:'Potatoes',q:400,u:'g'},{n:'Onion',q:150,u:'g'},{n:'Tomatoes',q:150,u:'g'},{n:'Ginger',q:20,u:'g'},{n:'Green chillies',q:2,u:''},{n:'Oil',q:40,u:'ml'},{n:'Cumin seeds',q:3,u:'g'},{n:'Turmeric',q:3,u:'g'},{n:'Coriander powder',q:8,u:'g'},{n:'Garam masala',q:5,u:'g'},{n:'Fresh coriander',q:15,u:'g'}]},
+
+  {id:'baingan-bharta',name:'Baingan Bharta',cat:'Sabzi',emoji:'🍆',origin:'Punjab',time:'40 min',serves:4,px:'baingan bharta roasted aubergine mash',
+   desc:'Flame-roasted aubergine mashed with spices — smoky, rich, and deeply flavourful.',
+   ings:[{n:'Large aubergines',q:900,u:'g'},{n:'Onions',q:200,u:'g'},{n:'Tomatoes',q:200,u:'g'},{n:'Green chillies',q:2,u:''},{n:'Ginger',q:20,u:'g'},{n:'Garlic',q:15,u:'g'},{n:'Oil',q:40,u:'ml'},{n:'Cumin seeds',q:3,u:'g'},{n:'Turmeric',q:2,u:'g'},{n:'Red chilli powder',q:3,u:'g'},{n:'Garam masala',q:5,u:'g'},{n:'Fresh coriander',q:20,u:'g'}]},
+
+  {id:'bhindi-masala',name:'Bhindi Masala',cat:'Sabzi',emoji:'🫛',origin:'North India',time:'25 min',serves:4,px:'bhindi masala okra curry spiced',
+   desc:'Spiced okra — if you can get it (most larger Sainsbury\'s or Waitrose), this is excellent.',
+   ings:[{n:'Okra (bhindi)',q:500,u:'g'},{n:'Onions',q:200,u:'g'},{n:'Tomatoes',q:150,u:'g'},{n:'Ginger',q:15,u:'g'},{n:'Green chillies',q:2,u:''},{n:'Oil',q:40,u:'ml'},{n:'Cumin seeds',q:3,u:'g'},{n:'Turmeric',q:2,u:'g'},{n:'Coriander powder',q:5,u:'g'},{n:'Amchur',q:3,u:'g'},{n:'Red chilli powder',q:3,u:'g'},{n:'Garam masala',q:3,u:'g'}]},
+
+  {id:'dum-aloo',name:'Dum Aloo',cat:'Sabzi',emoji:'🥔',origin:'Kashmir',time:'45 min',serves:4,px:'dum aloo baby potatoes curry kashmiri',
+   desc:'Whole baby potatoes in an intense Kashmiri gravy — far more interesting than standard aloo dishes.',
+   ings:[{n:'Baby potatoes',q:700,u:'g'},{n:'Full-fat yoghurt',q:150,u:'g'},{n:'Onions',q:250,u:'g'},{n:'Tomatoes',q:200,u:'g'},{n:'Oil',q:50,u:'ml'},{n:'Kashmiri red chilli powder',q:10,u:'g'},{n:'Fennel powder',q:5,u:'g'},{n:'Dry ginger powder',q:3,u:'g'},{n:'Turmeric',q:3,u:'g'},{n:'Garam masala',q:5,u:'g'},{n:'Cardamom pods',q:4,u:''},{n:'Cinnamon stick',q:1,u:''},{n:'Cloves',q:3,u:''},{n:'Fresh coriander',q:15,u:'g'}]},
+
+  {id:'baingan-salan',name:'Baingan ka Salan',cat:'Sabzi',emoji:'🍆',origin:'Hyderabad',time:'45 min',serves:4,px:'baingan ka salan hyderabadi aubergine peanut',
+   desc:'Hyderabadi aubergine in a tamarind and peanut gravy — completely different from bharta.',
+   ings:[{n:'Aubergines (small)',q:700,u:'g'},{n:'Peanuts (roasted)',q:80,u:'g'},{n:'Sesame seeds',q:20,u:'g'},{n:'Desiccated coconut',q:20,u:'g'},{n:'Onions',q:200,u:'g'},{n:'Tamarind paste',q:30,u:'g'},{n:'Oil',q:50,u:'ml'},{n:'Mustard seeds',q:3,u:'g'},{n:'Curry leaves',q:1,u:'sprig'},{n:'Turmeric',q:3,u:'g'},{n:'Red chilli powder',q:5,u:'g'},{n:'Coriander powder',q:8,u:'g'},{n:'Garam masala',q:5,u:'g'}]},
+
+  {id:'dahi-baingan',name:'Dahi Baingan',cat:'Sabzi',emoji:'🍆',origin:'North India',time:'30 min',serves:4,px:'dahi baingan aubergine yoghurt curry',
+   desc:'Aubergine in a yoghurt gravy — lighter and tangier than bharta, with a lovely sourness.',
+   ings:[{n:'Aubergines',q:600,u:'g'},{n:'Full-fat yoghurt',q:250,u:'g'},{n:'Onion',q:150,u:'g'},{n:'Ginger',q:15,u:'g'},{n:'Green chillies',q:2,u:''},{n:'Oil',q:40,u:'ml'},{n:'Mustard seeds',q:3,u:'g'},{n:'Curry leaves',q:1,u:'sprig'},{n:'Turmeric',q:2,u:'g'},{n:'Red chilli powder',q:3,u:'g'},{n:'Garam masala',q:3,u:'g'},{n:'Fresh coriander',q:15,u:'g'}]},
+
+  {id:'kofta',name:'Lauki Kofta Curry',cat:'Sabzi',emoji:'🟢',origin:'North India',time:'60 min',serves:4,px:'bottle gourd kofta curry vegetarian indian',
+   desc:'Bottle gourd dumplings simmered in an onion-tomato gravy. Add them just before serving.',
+   ings:[{n:'Bottle gourd (lauki)',q:700,u:'g'},{n:'Gram flour (besan)',q:80,u:'g'},{n:'Onions',q:380,u:'g'},{n:'Tomatoes',q:380,u:'g'},{n:'Ginger',q:20,u:'g'},{n:'Garlic',q:25,u:'g'},{n:'Green chillies',q:2,u:''},{n:'Oil',q:500,u:'ml (frying) + 45ml'},{n:'Cumin seeds',q:3,u:'g'},{n:'Turmeric',q:3,u:'g'},{n:'Coriander powder',q:8,u:'g'},{n:'Garam masala',q:5,u:'g'},{n:'Red chilli powder',q:3,u:'g'},{n:'Kasuri methi',q:8,u:'g'},{n:'Fresh coriander',q:20,u:'g'}]},
+
+  // ── DAL & LENTILS ──
+  {id:'dal-makhani',name:'Dal Makhani',cat:'Dal & Lentils',emoji:'🫕',origin:'Punjab',time:'90 min',serves:4,px:'dal makhani black lentil butter cream',
+   desc:'Slow-cooked black urad dal with butter and cream — rich, deeply flavoured, and very different from toor dal.',
+   ings:[{n:'Whole black urad dal',q:250,u:'g (soaked overnight)'},{n:'Kidney beans (rajma)',q:50,u:'g (soaked overnight)'},{n:'Butter',q:60,u:'g'},{n:'Single cream',q:100,u:'ml'},{n:'Onions',q:200,u:'g'},{n:'Tomatoes',q:300,u:'g'},{n:'Ginger',q:20,u:'g'},{n:'Garlic',q:20,u:'g'},{n:'Oil',q:30,u:'ml'},{n:'Cumin seeds',q:3,u:'g'},{n:'Bay leaves',q:2,u:''},{n:'Turmeric',q:3,u:'g'},{n:'Red chilli powder',q:5,u:'g'},{n:'Garam masala',q:5,u:'g'},{n:'Kasuri methi',q:8,u:'g'}]},
+
+  {id:'dal-tadka',name:'Dal Tadka',cat:'Dal & Lentils',emoji:'🫕',origin:'North India',time:'35 min',serves:4,px:'dal tadka yellow lentil toor tempered',
+   desc:'Toor dal with a generous ghee-fried tempering. The upgraded version of plain dal — the tadka is everything.',
+   ings:[{n:'Toor dal (split pigeon peas)',q:280,u:'g'},{n:'Onion',q:150,u:'g'},{n:'Tomatoes',q:150,u:'g'},{n:'Ginger',q:15,u:'g'},{n:'Garlic',q:15,u:'g'},{n:'Green chillies',q:2,u:''},{n:'Ghee',q:40,u:'g'},{n:'Oil',q:20,u:'ml'},{n:'Cumin seeds',q:3,u:'g'},{n:'Mustard seeds',q:3,u:'g'},{n:'Dried red chillies',q:3,u:''},{n:'Curry leaves',q:1,u:'sprig'},{n:'Turmeric',q:3,u:'g'},{n:'Red chilli powder',q:3,u:'g'},{n:'Asafoetida (hing)',q:1,u:'g'},{n:'Fresh coriander',q:15,u:'g'}]},
+
+  {id:'rajma',name:'Rajma',cat:'Dal & Lentils',emoji:'🫘',origin:'Punjab',time:'60 min',serves:4,px:'rajma kidney bean curry punjabi',
+   desc:'Kidney bean curry that tastes better the next day. One of the best reheating dishes on the list.',
+   ings:[{n:'Dried kidney beans (rajma)',q:350,u:'g (soaked overnight)'},{n:'Onions',q:280,u:'g'},{n:'Tomatoes',q:280,u:'g'},{n:'Ginger',q:20,u:'g'},{n:'Garlic',q:20,u:'g'},{n:'Oil',q:40,u:'ml'},{n:'Cumin seeds',q:3,u:'g'},{n:'Bay leaves',q:2,u:''},{n:'Cinnamon stick',q:1,u:''},{n:'Turmeric',q:3,u:'g'},{n:'Coriander powder',q:8,u:'g'},{n:'Cumin powder',q:3,u:'g'},{n:'Red chilli powder',q:5,u:'g'},{n:'Garam masala',q:5,u:'g'},{n:'Fresh coriander',q:15,u:'g'}]},
+
+  {id:'kadhi-pakora',name:'Kadhi Pakora',cat:'Dal & Lentils',emoji:'🥣',origin:'Punjab',time:'50 min',serves:4,px:'kadhi pakora yoghurt curry fritters punjabi',
+   desc:'Fried gram flour fritters in a tangy yoghurt and besan curry. Better the next day.',
+   ings:[{n:'Full-fat yoghurt',q:400,u:'g'},{n:'Gram flour (besan)',q:120,u:'g'},{n:'Onion (for pakoras)',q:130,u:'g'},{n:'Oil',q:500,u:'ml (frying) + 45ml'},{n:'Cumin seeds',q:5,u:'g'},{n:'Mustard seeds',q:3,u:'g'},{n:'Fenugreek seeds',q:2,u:'g'},{n:'Dried red chillies',q:4,u:''},{n:'Curry leaves',q:1,u:'sprig'},{n:'Turmeric',q:5,u:'g'},{n:'Red chilli powder',q:3,u:'g'},{n:'Coriander powder',q:5,u:'g'},{n:'Asafoetida (hing)',q:1,u:'g'},{n:'Ginger',q:20,u:'g'},{n:'Green chillies',q:2,u:''},{n:'Fresh coriander',q:20,u:'g'}]},
+
+  {id:'panchmel-dal',name:'Panchmel Dal',cat:'Dal & Lentils',emoji:'🫕',origin:'Rajasthan',time:'45 min',serves:4,px:'panchmel dal five lentils rajasthani',
+   desc:'Five lentils cooked together — Rajasthani. Very different texture and depth from any single-lentil dal.',
+   ings:[{n:'Toor dal',q:60,u:'g'},{n:'Chana dal',q:60,u:'g'},{n:'Moong dal (split)',q:60,u:'g'},{n:'Urad dal (split)',q:60,u:'g'},{n:'Whole masoor dal',q:60,u:'g'},{n:'Onion',q:150,u:'g'},{n:'Tomatoes',q:150,u:'g'},{n:'Ginger',q:15,u:'g'},{n:'Garlic',q:15,u:'g'},{n:'Ghee',q:40,u:'g'},{n:'Cumin seeds',q:3,u:'g'},{n:'Bay leaves',q:2,u:''},{n:'Cloves',q:3,u:''},{n:'Dried red chillies',q:3,u:''},{n:'Turmeric',q:3,u:'g'},{n:'Coriander powder',q:5,u:'g'},{n:'Garam masala',q:3,u:'g'},{n:'Amchur',q:3,u:'g'}]},
+
+  {id:'amti',name:'Amti',cat:'Dal & Lentils',emoji:'🫕',origin:'Maharashtra',time:'40 min',serves:4,px:'amti maharashtrian toor dal tamarind',
+   desc:'Maharashtrian toor dal with tamarind, jaggery, and kokum — sweet, sour, and spicy all at once.',
+   ings:[{n:'Toor dal',q:280,u:'g'},{n:'Tamarind paste',q:20,u:'g'},{n:'Jaggery',q:20,u:'g'},{n:'Kokum (dried)',q:4,u:'pieces'},{n:'Oil',q:30,u:'ml'},{n:'Mustard seeds',q:3,u:'g'},{n:'Cumin seeds',q:3,u:'g'},{n:'Curry leaves',q:1,u:'sprig'},{n:'Dried red chillies',q:3,u:''},{n:'Asafoetida (hing)',q:1,u:'g'},{n:'Turmeric',q:3,u:'g'},{n:'Red chilli powder',q:3,u:'g'},{n:'Goda masala (or garam masala)',q:5,u:'g'},{n:'Fresh coriander',q:15,u:'g'}]},
+
+  {id:'methi-dal',name:'Methi Dal',cat:'Dal & Lentils',emoji:'🌿',origin:'North India',time:'35 min',serves:4,px:'methi dal fenugreek lentil curry',
+   desc:'Toor or moong dal with fresh fenugreek leaves — excellent if you can source fresh methi.',
+   ings:[{n:'Toor dal or moong dal',q:280,u:'g'},{n:'Fresh fenugreek leaves (methi)',q:120,u:'g'},{n:'Onion',q:150,u:'g'},{n:'Tomatoes',q:150,u:'g'},{n:'Ginger',q:15,u:'g'},{n:'Garlic',q:15,u:'g'},{n:'Ghee',q:35,u:'g'},{n:'Cumin seeds',q:3,u:'g'},{n:'Turmeric',q:3,u:'g'},{n:'Red chilli powder',q:3,u:'g'},{n:'Coriander powder',q:5,u:'g'},{n:'Garam masala',q:3,u:'g'}]},
+
+  // ── RICE & ONE-POT ──
+  {id:'bisi-bele-bath',name:'Bisi Bele Bath',cat:'Rice & One-Pot',emoji:'🍚',origin:'Karnataka',time:'60 min',serves:4,px:'bisi bele bath karnataka rice lentil',
+   desc:'Karnataka one-pot dish of rice, lentils, and vegetables. A complete meal on its own.',
+   ings:[{n:'Short-grain or regular rice',q:200,u:'g'},{n:'Toor dal',q:150,u:'g'},{n:'Mixed vegetables (carrot, beans, peas)',q:300,u:'g'},{n:'Onion',q:150,u:'g'},{n:'Tomatoes',q:150,u:'g'},{n:'Tamarind paste',q:20,u:'g'},{n:'Ghee',q:40,u:'g'},{n:'Oil',q:30,u:'ml'},{n:'Bisi bele bath powder',q:20,u:'g'},{n:'Mustard seeds',q:3,u:'g'},{n:'Curry leaves',q:1,u:'sprig'},{n:'Dried red chillies',q:3,u:''},{n:'Cashews',q:30,u:'g'},{n:'Asafoetida (hing)',q:1,u:'g'},{n:'Turmeric',q:3,u:'g'}]},
+
+  {id:'tehri',name:'Tehri',cat:'Rice & One-Pot',emoji:'🍚',origin:'Uttar Pradesh',time:'40 min',serves:4,px:'tehri vegetable pulao yellow rice UP',
+   desc:'UP-style vegetable pulao — much more spiced and aromatic than standard pulao.',
+   ings:[{n:'Basmati rice',q:300,u:'g'},{n:'Potatoes',q:300,u:'g'},{n:'Mixed vegetables',q:200,u:'g'},{n:'Onions',q:200,u:'g'},{n:'Tomatoes',q:150,u:'g'},{n:'Ghee',q:40,u:'g'},{n:'Bay leaves',q:2,u:''},{n:'Cardamom pods',q:3,u:''},{n:'Cinnamon stick',q:1,u:''},{n:'Cloves',q:3,u:''},{n:'Cumin seeds',q:3,u:'g'},{n:'Turmeric',q:5,u:'g'},{n:'Red chilli powder',q:3,u:'g'},{n:'Coriander powder',q:5,u:'g'},{n:'Garam masala',q:5,u:'g'},{n:'Fresh coriander',q:20,u:'g'}]},
+
+  // ── FISH ──
+  {id:'goan-fish',name:'Goan Fish Curry',cat:'Fish',emoji:'🐟',origin:'Goa',time:'35 min',serves:4,px:'goan fish curry coconut red spicy',
+   desc:'Tangy, coconut-based fish curry with Kashmiri chillies — one of the great regional curries of India.',
+   ings:[{n:'Firm white fish fillets (cod / haddock)',q:700,u:'g'},{n:'Coconut milk',q:400,u:'ml'},{n:'Onion',q:200,u:'g'},{n:'Tomatoes',q:200,u:'g'},{n:'Garlic',q:25,u:'g'},{n:'Ginger',q:20,u:'g'},{n:'Dried Kashmiri red chillies',q:8,u:''},{n:'Tamarind paste',q:20,u:'g'},{n:'Oil',q:40,u:'ml'},{n:'Mustard seeds',q:3,u:'g'},{n:'Curry leaves',q:1,u:'sprig'},{n:'Turmeric',q:3,u:'g'},{n:'Coriander powder',q:5,u:'g'},{n:'Fresh coriander',q:15,u:'g'}]},
+
+  {id:'meen-moilee',name:'Meen Moilee',cat:'Fish',emoji:'🐟',origin:'Kerala',time:'30 min',serves:4,px:'meen moilee kerala fish coconut milk mild',
+   desc:'Kerala fish curry with coconut milk and turmeric — pale, aromatic, and delicate. Completely different from a standard curry.',
+   ings:[{n:'Firm white fish fillets',q:700,u:'g'},{n:'Coconut milk',q:400,u:'ml'},{n:'Onion',q:200,u:'g'},{n:'Green chillies',q:4,u:''},{n:'Ginger',q:25,u:'g'},{n:'Garlic',q:20,u:'g'},{n:'Tomatoes',q:150,u:'g'},{n:'Oil (coconut preferred)',q:40,u:'ml'},{n:'Mustard seeds',q:3,u:'g'},{n:'Curry leaves',q:2,u:'sprigs'},{n:'Turmeric',q:5,u:'g'},{n:'Black pepper',q:5,u:'g'},{n:'Lime juice',q:15,u:'ml'}]},
+
+  {id:'machher-jhol',name:'Machher Jhol',cat:'Fish',emoji:'🐟',origin:'Bengal',time:'35 min',serves:4,px:'machher jhol bengali fish curry mustard',
+   desc:'Bengali everyday fish curry with mustard oil and potatoes — light, sharp, and very different from southern fish curries.',
+   ings:[{n:'Firm fish (rohu / carp / cod)',q:700,u:'g'},{n:'Potatoes',q:300,u:'g'},{n:'Onion',q:180,u:'g'},{n:'Tomatoes',q:150,u:'g'},{n:'Mustard oil',q:60,u:'ml'},{n:'Ginger',q:20,u:'g'},{n:'Garlic',q:15,u:'g'},{n:'Green chillies',q:3,u:''},{n:'Panch phoron (five spice blend)',q:5,u:'g'},{n:'Turmeric',q:5,u:'g'},{n:'Red chilli powder',q:5,u:'g'},{n:'Cumin powder',q:3,u:'g'},{n:'Fresh coriander',q:15,u:'g'}]},
+
+  {id:'malabar-prawn',name:'Malabar Prawn Curry',cat:'Fish',emoji:'🦐',origin:'Kerala',time:'30 min',serves:4,px:'malabar prawn curry coconut kerala spicy',
+   desc:'Prawns in a rich, tangy coconut and Kodampuli (Malabar tamarind) curry — deeply aromatic.',
+   ings:[{n:'Raw king prawns, peeled',q:600,u:'g'},{n:'Coconut milk',q:400,u:'ml'},{n:'Onion',q:200,u:'g'},{n:'Tomatoes',q:150,u:'g'},{n:'Ginger',q:20,u:'g'},{n:'Garlic',q:20,u:'g'},{n:'Green chillies',q:3,u:''},{n:'Kodampuli / tamarind paste',q:15,u:'g'},{n:'Coconut oil',q:40,u:'ml'},{n:'Mustard seeds',q:3,u:'g'},{n:'Curry leaves',q:2,u:'sprigs'},{n:'Turmeric',q:3,u:'g'},{n:'Red chilli powder',q:5,u:'g'},{n:'Coriander powder',q:5,u:'g'},{n:'Black pepper',q:3,u:'g'}]},
+
+  // ── ADD NEW RECIPES ABOVE THIS LINE ──
+]; // ← DO NOT DELETE THIS LINE
+
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+//  END OF RECIPE DATA — do not edit below this line
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+// ── STATE ──
+const sel={}; // id -> servings override
+let globalServings=4;
+let panOpen=false;
+let activeFilter='All';
+
+// ── FILTERS ──
+function buildFilters(){
+  const cats=['All',...new Set(R.map(r=>r.cat))];
+  const bar=document.getElementById('filter-bar');
+  bar.innerHTML=cats.map(c=>`<button class="fbtn${c==='All'?' active':''}" onclick="setFilter('${c}')">${c}</button>`).join('');
+}
+
+function setFilter(cat){
+  activeFilter=cat;
+  document.querySelectorAll('.fbtn').forEach(b=>b.classList.toggle('active',b.textContent===cat));
+  document.querySelectorAll('.card').forEach(card=>{
+    const id=card.id.replace('card-','');
+    const r=R.find(x=>x.id===id);
+    if(r) card.classList.toggle('hidden', cat!=='All' && r.cat!==cat);
+  });
+  // hide/show category headers
+  document.querySelectorAll('.cat-hdr').forEach(hdr=>{
+    const catName=hdr.querySelector('.cat-lbl').textContent;
+    hdr.style.display=(cat==='All'||cat===catName)?'flex':'none';
+  });
+  document.querySelectorAll('.grid').forEach(g=>{
+    const visible=[...g.querySelectorAll('.card')].some(c=>!c.classList.contains('hidden'));
+    g.style.display=visible?'grid':'none';
+  });
+}
+
+// ── GRID ──
+function renderGrid(){
+  const cats=[...new Set(R.map(r=>r.cat))];
+  let h='';
+  cats.forEach(cat=>{
+    const dishes=R.filter(r=>r.cat===cat);
+    h+=`<div class="cat-hdr"><div class="cat-lbl">${cat}</div><div class="cat-line"></div></div><div class="grid">`;
+    dishes.forEach(r=>{
+      h+=`<div class="card" id="card-${r.id}" onclick="openModal('${r.id}')">
+        <div class="card-img" id="img-${r.id}"><div class="card-ph">${r.emoji}</div></div>
+        <div class="chk"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg></div>
+        <div class="origin-tag">${r.origin}</div>
+        <div class="card-body">
+          <div class="card-name">${r.name}</div>
+          <div class="card-desc">${r.desc.substring(0,88)}…</div>
+          <div class="card-meta"><span>⏱ ${r.time}</span><span>👥 ${r.serves}</span></div>
+        </div>
+      </div>`;
+    });
+    h+='</div>';
+  });
+  document.getElementById('recipe-grid').innerHTML=h;
+  R.forEach(r=>loadImg(r));
+}
+
+async function loadImg(r){
+  const wrap=document.getElementById('img-'+r.id);if(!wrap)return;
+  const url=await pexFetch(r.px,r.id);
+  if(url&&document.getElementById('img-'+r.id)){
+    const img=new Image();
+    img.onload=()=>{wrap.innerHTML='';wrap.appendChild(img);};
+    img.src=url;img.alt=r.name;
+    img.style.cssText='width:100%;height:100%;object-fit:cover;display:block;transition:transform 0.35s ease';
+  }
+}
+
+// ── SERVING SCALING ──
+function scaleQty(q,u,factor){
+  if(q===0||u==='to taste')return 'to taste';
+  const scaled=q*factor;
+  // Smart rounding
+  const rounded=scaled<5?Math.round(scaled*10)/10:scaled<50?Math.round(scaled):Math.round(scaled/5)*5;
+  return rounded+(u?(' '+u):'');
+}
+
+function getServings(id){ return sel[id]||globalServings; }
+
+// ── SELECT / DESELECT ──
+function toggleSel(id){
+  if(sel[id]!==undefined){ delete sel[id]; document.getElementById('card-'+id)?.classList.remove('selected'); }
+  else{ sel[id]=globalServings; document.getElementById('card-'+id)?.classList.add('selected'); }
+  updatePanel();
+}
+
+function removeDish(id){
+  delete sel[id];
+  document.getElementById('card-'+id)?.classList.remove('selected');
+  updatePanel();
+  if(Object.keys(sel).length===0&&panOpen)togglePanel();
+}
+
+// ── PANEL SCALING ──
+function panelScale(dir){
+  globalServings=Math.max(1,Math.min(20,globalServings+dir));
+  // update all selected to new global
+  Object.keys(sel).forEach(id=>sel[id]=globalServings);
+  document.getElementById('panel-serves').textContent=globalServings+' serving'+(globalServings===1?'':'s');
+  updatePanel();
+}
+
+// ── BUILD INGREDIENT MAP ──
+function buildIngMap(){
+  const m={};
+  Object.keys(sel).forEach(id=>{
+    const r=R.find(x=>x.id===id);if(!r)return;
+    const factor=sel[id]/r.serves;
+    r.ings.forEach(i=>{
+      const k=i.n.toLowerCase();
+      if(!m[k])m[k]={n:i.n,q:i.q,u:i.u,factor,total:i.q===0?0:i.q*factor};
+      else if(i.q>0) m[k].total+=i.q*factor;
+    });
+  });
+  return m;
+}
+
+function formatIng(entry){
+  if(entry.q===0||entry.u==='to taste')return 'to taste';
+  const v=entry.total;
+  const rounded=v<5?Math.round(v*10)/10:v<50?Math.round(v):Math.round(v/5)*5;
+  return rounded+(entry.u?' '+entry.u:'');
+}
+
+// ── UPDATE PANEL ──
+function updatePanel(){
+  const ids=Object.keys(sel);
+  const cnt=ids.length;
+  document.getElementById('pcnt').textContent=cnt+(cnt===1?' dish':' dishes');
+  const m=buildIngMap();
+  const ings=Object.values(m).sort((a,b)=>a.n.localeCompare(b.n));
+  const pempty=document.getElementById('pempty');
+  const ilist=document.getElementById('ilist');
+  const btn=document.getElementById('copybtn');
+  const dtags=document.getElementById('dtags');
+  const scalerRow=document.getElementById('scaler-row');
+  document.getElementById('panel-serves').textContent=globalServings+' serving'+(globalServings===1?'':'s');
+
+  if(cnt===0){
+    pempty.style.display='block';ilist.innerHTML='';btn.style.display='none';
+    dtags.innerHTML='';scalerRow.style.display='none';return;
+  }
+  pempty.style.display='none';scalerRow.style.display='flex';
+  dtags.innerHTML=ids.map(id=>{
+    const r=R.find(x=>x.id===id);
+    return r?`<div class="dish-tag">${r.name}<span class="dish-tag-x" onclick="event.stopPropagation();removeDish('${id}')">✕</span></div>`:'';
+  }).join('');
+  ilist.innerHTML=ings.map(i=>`<div class="ing-item"><div class="ing-dot"></div><div class="ing-name">${i.n}</div><div class="ing-qty">${formatIng(i)}</div></div>`).join('');
+  btn.style.display='block';
+  btn.textContent=`Copy Shopping List — ${ings.length} items`;
+  btn.classList.remove('copied');
+  if(!panOpen)togglePanel();
+}
+
+function togglePanel(){panOpen=!panOpen;document.getElementById('panel').classList.toggle('open',panOpen);}
+
+function copyList(){
+  const m=buildIngMap();
+  const dishes=Object.keys(sel).map(id=>R.find(x=>x.id===id)?.name).filter(Boolean).join(', ');
+  const lines=['CITYBRIDGE KITCHEN — SHOPPING LIST',`Dishes: ${dishes}`,`Servings: ${globalServings}`,'',
+    ...Object.values(m).sort((a,b)=>a.n.localeCompare(b.n)).map(i=>`• ${i.n} — ${formatIng(i)}`)];
+  navigator.clipboard.writeText(lines.join('\n')).then(()=>{
+    const btn=document.getElementById('copybtn');
+    btn.textContent='✓ Copied!';btn.classList.add('copied');
+    setTimeout(()=>{btn.textContent=`Copy Shopping List — ${Object.values(m).length} items`;btn.classList.remove('copied');},2500);
+  });
+}
+
+// ── MODAL ──
+let modalServings=4;
+let modalId=null;
+
+function openModal(id){
+  const r=R.find(x=>x.id===id);if(!r)return;
+  modalId=id;
+  modalServings=sel[id]||globalServings;
+  renderModal(r);
+  document.getElementById('overlay').classList.add('on');
+  document.body.style.overflow='hidden';
+}
+
+function renderModal(r){
+  const isSel=sel[r.id]!==undefined;
+  const cached=imgCache[r.id];
+  const imgH=cached?`<img src="${cached}" alt="${r.name}" style="width:100%;height:100%;object-fit:cover;display:block">`:`<div class="mph">${r.emoji}</div>`;
+  const factor=modalServings/r.serves;
+  document.getElementById('mc').innerHTML=`
+    <div class="m-img" id="mimg">${imgH}</div>
+    <div class="m-body">
+      <div class="m-tag">${r.cat} · ${r.origin}</div>
+      <div class="m-title">${r.name}</div>
+      <div class="m-desc">${r.desc}</div>
+      <div class="m-scaler">
+        <div class="m-scaler-label">Adjust servings</div>
+        <div class="m-scaler-ctrl">
+          <button class="m-scaler-btn" onclick="adjustModal(-1)">−</button>
+          <div class="m-scaler-val" id="modal-sv">${modalServings} serving${modalServings===1?'':'s'}</div>
+          <button class="m-scaler-btn" onclick="adjustModal(1)">+</button>
+        </div>
+      </div>
+      <div class="m-sec">Ingredients</div>
+      <div class="m-ings" id="m-ings">${r.ings.map(i=>`<div class="m-ing">${i.n} — ${scaleQty(i.q,i.u,factor)}</div>`).join('')}</div>
+      <div class="m-footer">
+        <button class="m-btn m-btn-p" id="m-sel-btn" onclick="modalToggleSel()">${isSel?'✓ Remove from List':'+ Add to Shopping List'}</button>
+        <button class="m-btn m-btn-s" onclick="closeModal()">Close</button>
+      </div>
+    </div>`;
+  if(!cached){
+    pexFetch(r.px,r.id).then(url=>{
+      if(url){const w=document.getElementById('mimg');if(w)w.innerHTML=`<img src="${url}" alt="${r.name}" style="width:100%;height:100%;object-fit:cover;display:block">`;}
+    });
+  }
+}
+
+function adjustModal(dir){
+  modalServings=Math.max(1,Math.min(20,modalServings+dir));
+  const r=R.find(x=>x.id===modalId);if(!r)return;
+  const factor=modalServings/r.serves;
+  document.getElementById('modal-sv').textContent=modalServings+' serving'+(modalServings===1?'':'s');
+  document.getElementById('m-ings').innerHTML=r.ings.map(i=>`<div class="m-ing">${i.n} — ${scaleQty(i.q,i.u,factor)}</div>`).join('');
+  // if dish is already selected, update its serving count live
+  if(sel[modalId]!==undefined){sel[modalId]=modalServings;updatePanel();}
+}
+
+function modalToggleSel(){
+  if(sel[modalId]!==undefined){
+    delete sel[modalId];
+    document.getElementById('card-'+modalId)?.classList.remove('selected');
+    document.getElementById('m-sel-btn').textContent='+ Add to Shopping List';
+  } else {
+    sel[modalId]=modalServings;
+    document.getElementById('card-'+modalId)?.classList.add('selected');
+    document.getElementById('m-sel-btn').textContent='✓ Remove from List';
+  }
+  updatePanel();
+}
+
+function closeModal(){document.getElementById('overlay').classList.remove('on');document.body.style.overflow='';}
+function outsideClose(e){if(e.target===document.getElementById('overlay'))closeModal();}
+document.addEventListener('keydown',e=>{if(e.key==='Escape')closeModal();});
+
+buildFilters();
+renderGrid();
+</script>
+</body>
+</html>
